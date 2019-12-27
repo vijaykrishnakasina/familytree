@@ -1,6 +1,7 @@
 package com.oracle.familytree.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,11 @@ public class AddRelationsHelper {
 		return relationRepository.findAllByPersonAndRelationType(p1, relationType).stream().map(relation -> relation.getRelatee()).collect(Collectors.toList());
 	}
 
-	public List<Person> getRelatives(Long person_id) {
-		return relationRepository.findAllByPerson_id(person_id).stream().map(relation -> relation.getRelatee()).collect(Collectors.toList());
+	public Map<RelationType, List<Person>> getRelatives(Long person_id) {
+		List<Relation> relations = relationRepository.findAllByPerson_id(person_id);
+		
+		 return relations.stream().collect(Collectors.groupingBy(Relation::getRelationType, Collectors.mapping(Relation::getRelatee, Collectors.toList())));
+		
 	}
 
 	public void addToSelf(Person p1, Person p2, RelationType parent) {

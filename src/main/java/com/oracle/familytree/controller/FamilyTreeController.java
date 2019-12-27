@@ -24,8 +24,8 @@ public class FamilyTreeController {
 	}
 
 	@RequestMapping("/getFamilyTree")
-	public Map<RelationType, List<Person>> getFamilyTree(Long id) {
-		return familyTreeService.getFamilyTreeByPersonId(1L);
+	public Map<RelationType, List<Person>> getFamilyTree(@RequestParam Long id) {
+		return familyTreeService.getFamilyTreeByPersonId(id);
 	}
 
 	@RequestMapping("/addRelation")

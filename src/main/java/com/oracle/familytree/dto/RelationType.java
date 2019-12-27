@@ -5,7 +5,7 @@ public enum RelationType {
 	
 	GRAND_PARENT(2),
 	PARENT(1),
-	SPOUCE(0),
+	SPOUSE(0),
 	SIBLING(0),
 	CHILD(-1),
 	GRAND_CHILD(-2);

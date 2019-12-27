@@ -30,7 +30,7 @@ public class FamilyTreeServiceImpl implements FamilyTreeService {
 	// TODO : get all relatives and use streams.collect(groupby relation)
 		result.put(RelationType.GRAND_PARENT, addRelationsHelper.getRelatives(p1, RelationType.GRAND_PARENT));
 		result.put(RelationType.PARENT, addRelationsHelper.getRelatives(p1, RelationType.PARENT));
-		result.put(RelationType.SPOUCE, addRelationsHelper.getRelatives(p1, RelationType.SPOUCE));
+		result.put(RelationType.SPOUSE, addRelationsHelper.getRelatives(p1, RelationType.SPOUSE));
 		return result;
 	}
 
@@ -60,7 +60,7 @@ public class FamilyTreeServiceImpl implements FamilyTreeService {
 			// if a parent is added to a person we need to link the parent - p2 to GP, P, Sib, Child of that person p1
 			addRelationsHelper.addToSelf(p1, p2,RelationType.PARENT);
 			addRelationsHelper.addToGrandParents(p1, p2, RelationType.CHILD);
-			addRelationsHelper.addToParents(p1, p2, RelationType.SPOUCE);
+			addRelationsHelper.addToParents(p1, p2, RelationType.SPOUSE);
 			addRelationsHelper.addToSiblings(p1, p2, RelationType.PARENT);
 			addRelationsHelper.addToChilds(p1, p2, RelationType.GRAND_PARENT);
 			break;
@@ -92,10 +92,7 @@ public class FamilyTreeServiceImpl implements FamilyTreeService {
 
 	@Override
 	public Map<RelationType, List<Person>> getFamilyTreeByPersonId(Long id) {
-		// TODO Auto-generated method stub
-		Map<RelationType, List<Person>> result = new LinkedHashMap<>();
-		result.put(RelationType.CHILD, addRelationsHelper.getRelatives(id));
-		return result;
+		return addRelationsHelper.getRelatives(id);
 	}
 
 }
