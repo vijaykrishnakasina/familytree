@@ -1,8 +1,11 @@
 package com.oracle.familytree.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import static com.oracle.familytree.dto.RelationType.CHILD;
+import static com.oracle.familytree.dto.RelationType.GRAND_CHILD;
+import static com.oracle.familytree.dto.RelationType.GRAND_PARENT;
+import static com.oracle.familytree.dto.RelationType.PARENT;
+import static com.oracle.familytree.dto.RelationType.SPOUSE;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +28,7 @@ public class FamilyTreeServiceImpl implements FamilyTreeService {
 
 	@Override
 	public Map<RelationType, List<Person>> getFamilyTree(Person p1) {
-		Map<RelationType, List<Person>> result = new LinkedHashMap<>();
-		List<Person> persons = new ArrayList<>();
-	// TODO : get all relatives and use streams.collect(groupby relation)
-		result.put(RelationType.GRAND_PARENT, addRelationsHelper.getRelatives(p1, RelationType.GRAND_PARENT));
-		result.put(RelationType.PARENT, addRelationsHelper.getRelatives(p1, RelationType.PARENT));
-		result.put(RelationType.SPOUSE, addRelationsHelper.getRelatives(p1, RelationType.SPOUSE));
-		return result;
+		return getFamilyTreeByPersonId(p1.getId());
 	}
 
 	@Override
@@ -44,8 +41,13 @@ public class FamilyTreeServiceImpl implements FamilyTreeService {
 			Person p1 = personRepo.getOne(personId1);
 			Person p2 = personRepo.getOne(personId2);
 
-			return addRelation(p1, p2, relationType);
+			System.out.println(p1);
+			System.out.println(p2);
+			
+			addRelation(p1, p2, relationType);
+			addRelation(p2, p1, relationType.getInverseRelation());
 
+			return getFamilyTreeByPersonId(p1.getId());
 			// TODO: Handle correct type of exception
 		} catch (HibernateException e) {
 			System.out.println("Person is not found in the DB with given id");
@@ -54,25 +56,78 @@ public class FamilyTreeServiceImpl implements FamilyTreeService {
 		return null;
 	}
 
-	private Map<RelationType, List<Person>> addRelation(Person p1, Person p2, RelationType relationType) {
+	/**
+	 * This method takes care of adding relationships to a person and also recursively adding relations with existing relatives of the person 
+	 * @param p1
+	 * @param p2
+	 * @param relationType
+	 * @return familyTree of the person after the adding new relationship
+	 * 
+	 */
+	public Map<RelationType, List<Person>> addRelation(Person p1, Person p2, RelationType relationType) {
+		
+		System.out.println("adding "+relationType +" between " + p1.getId()+ " and "+ p2.getId());
 		switch (relationType) {
 		case PARENT:
-			// if a parent is added to a person we need to link the parent - p2 to GP, P, Sib, Child of that person p1
-			addRelationsHelper.addToSelf(p1, p2,RelationType.PARENT);
-			addRelationsHelper.addToGrandParents(p1, p2, RelationType.CHILD);
-			addRelationsHelper.addToParents(p1, p2, RelationType.SPOUSE);
-			addRelationsHelper.addToSiblings(p1, p2, RelationType.PARENT);
-			addRelationsHelper.addToChilds(p1, p2, RelationType.GRAND_PARENT);
+			
+			// add to self as parent
+			addRelationsHelper.addToPerson(p1, p2,PARENT);
+
+			//add to parent as spouse
+			addRelationsHelper.addRelationToRelatee(p1, p2, PARENT, SPOUSE);
+			
+			// add to child as grandparent
+			addRelationsHelper.addRelationToRelatee(p1, p2, CHILD, GRAND_PARENT);
+			
 			break;
 
 		case CHILD:
-			addRelationsHelper.addToParents(p1, p2, RelationType.GRAND_CHILD);
-			addRelationsHelper.addToSpouse(p1, p2, RelationType.CHILD);
-			addRelationsHelper.addToChilds(p1, p2, RelationType.SIBLING);
 			
-			// TODO: how to know if there are many childs and many grand childs ..... we need to restrict this one.. 
-			addRelationsHelper.addToGrandChilds(p1, p2, RelationType.PARENT);
+			// add child to self
+			addRelationsHelper.addToPerson(p1, p2, CHILD);
+			
+			// add grand-child to parents
+			addRelationsHelper.addRelationToRelatee(p1, p2, PARENT, GRAND_CHILD);
+			
+			// add child to the spouse
+			addRelationsHelper.addRelationToRelatee(p1, p2, SPOUSE, CHILD);
+			
+			// add parent to the grand-child
+			addRelationsHelper.addRelationToRelatee(p1, p2, GRAND_CHILD, PARENT);
+			
 			break;
+		
+		case SPOUSE:
+			
+			// add spouse to the self
+			addRelationsHelper.addToPerson(p1, p2, SPOUSE);
+			
+			// add parent to the child
+			addRelationsHelper.addRelationToRelatee(p1, p2, CHILD, PARENT);
+			
+			// add grand-parent to all grand-child
+			addRelationsHelper.addRelationToRelatee(p1, p2, GRAND_CHILD, GRAND_PARENT);
+			
+			break;
+			
+		case GRAND_CHILD:
+			
+			// add grand-parent to the self
+			addRelationsHelper.addToPerson(p1, p2, GRAND_CHILD);
+			
+			// add parent to the child
+			addRelationsHelper.addRelationToRelatee(p1, p2, CHILD, PARENT);
+			
+			break;
+		
+		case GRAND_PARENT:
+			
+			// add grand-parent to the self
+			addRelationsHelper.addToPerson(p1, p2, GRAND_PARENT);
+			
+			break;
+			
+			
 		default:
 			break;
 		}
@@ -83,6 +138,11 @@ public class FamilyTreeServiceImpl implements FamilyTreeService {
 	@Override
 	public Person addPerson(String name, String gender) {
 		return personRepo.save(Person.builder().name(name).gender(gender).build());
+	}
+	
+	@Override
+	public Person addPerson(Person person) {
+		return personRepo.save(person);
 	}
 
 	@Override

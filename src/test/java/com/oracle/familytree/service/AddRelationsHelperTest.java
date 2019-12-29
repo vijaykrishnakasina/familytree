@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.oracle.familytree.dto.Person;
 import com.oracle.familytree.dto.RelationType;
+import com.oracle.familytree.repository.PersonRepository;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -21,10 +22,20 @@ public class AddRelationsHelperTest {
 	@Autowired
 	AddRelationsHelper addRelationsHelper;
 	
+	@Autowired
+	PersonRepository personRepository;
+	
 	@Test
-	public void test() {
+	public void testGetRelatives() {
 		Map<RelationType, List<Person>> relations = addRelationsHelper.getRelatives(1L);
 		System.out.println(relations);
 		assertTrue(!relations.isEmpty());
+	}
+	
+	@Test
+	public void testRelativesByRelationShip() {
+		List<Person> childs = addRelationsHelper.getRelatives(personRepository.getOne(1L), RelationType.CHILD);
+		System.out.println(childs);
+		assertTrue(!childs.isEmpty());
 	}
 }

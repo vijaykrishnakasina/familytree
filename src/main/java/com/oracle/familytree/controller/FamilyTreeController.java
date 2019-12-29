@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +14,7 @@ import com.oracle.familytree.dto.Person;
 import com.oracle.familytree.dto.RelationType;
 import com.oracle.familytree.service.FamilyTreeService;
 
-@RestController
+@RestController(value = "/api")
 public class FamilyTreeController {
 
 	@Autowired
@@ -36,10 +38,9 @@ public class FamilyTreeController {
 		return familyTreeService.addRelation(personId1, personId2, relationTyle);
 	}
 	
-	//TODO : may be we could take person as post request body after development
-	@RequestMapping("/addPerson")
-	public Person addPerson(String name, String gender) {
-		return familyTreeService.addPerson(name, gender);
+	@RequestMapping(value = "/addPerson", method = RequestMethod.POST )
+	public Person addPerson(@RequestBody Person person) {
+		return familyTreeService.addPerson(person);
 	}
 	
 	@RequestMapping("/getAllPersons")

@@ -11,6 +11,7 @@ import com.oracle.familytree.dto.RelationType;
 public interface RelationRepository extends JpaRepository<Relation, Long> {
 
 	List<Relation> findAllByPersonAndRelationType(Person person, RelationType grandParent);
-	List<Relation> findAllByPerson_id(Long person_id);
+	List<Relation> findAllByPerson_id(Long person_id); 	
+	List<Relation> findAllByPersonAndRelateeAndRelationType(Person person,Person Relatee, RelationType relationType);
 
 }
