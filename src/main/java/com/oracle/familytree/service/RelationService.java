@@ -34,9 +34,6 @@ public class RelationService {
 	@Autowired
 	RelationRepository relationRepository;
 
-	@Autowired
-	FamilyTreeServiceImpl familyTreeService;
-	
 	
 	/**
 	 * returns all relatives of the given person by person id group by relation type
@@ -118,9 +115,11 @@ public class RelationService {
 	}
 
 	/**
-	 * finds the relation between relationWithPerson with relationType
+	 * finds the relation between existingRelative and  newRelative with relationType
 	 * 
-	 * secifically what the first parameter is to second parameter
+	 * getRelation(SPOUSE, CHILD) would return CHILD
+	 * 
+	 * which means what would a person's SPOUSE call person's CHILD == CHILD
 	 * 
 	 * @param existingRelative
 	 * @param newRelative
@@ -159,7 +158,7 @@ public class RelationService {
 			case PARENT:
 				return GRAND_PARENT;
 			case SPOUSE:
-				return CHILD;
+				return PARENT;
 			case CHILD:
 				return SIBLING;
 			default:
@@ -173,9 +172,9 @@ public class RelationService {
 			case PARENT:
 				return SPOUSE;
 			case CHILD:
-				return GRAND_PARENT;
+				return GRAND_CHILD;
 			case SIBLING:
-				return PARENT;
+				return CHILD;
 			default:
 				return null;
 			}
@@ -185,7 +184,7 @@ public class RelationService {
 		if (GRAND_PARENT.equals(existingRelative)) {
 			switch (newRelative) {
 			case SIBLING:
-				return GRAND_PARENT;
+				return GRAND_CHILD;
 			default:
 				return null;
 			}
@@ -195,7 +194,7 @@ public class RelationService {
 		if (GRAND_CHILD.equals(existingRelative)) {
 			switch (newRelative) {
 			case SPOUSE:
-				return GRAND_CHILD;
+				return GRAND_PARENT;
 			default:
 				return null;
 			}

@@ -30,7 +30,7 @@ class FamilytreeApplicationTests {
 	
 	
 	@Test
-	void contextLoads() {
+	void contextLoads1() {
 		
 		// add 106 - wife  as spouse to 105 - person
 		relationController.addRelation(RelationDTO.builder().personId(105L).relativeId(106L).relationType(RelationType.SPOUSE).build());
@@ -64,6 +64,16 @@ class FamilytreeApplicationTests {
 		// now grand parent- 109 should be added as parent to the parent 108
 		relationController.addRelation(RelationDTO.builder().personId(108L).relativeId(109L).relationType(RelationType.PARENT).build());
 		
+	}
+	
+	@Test
+	void parentChildTest() {
+		relationController.addRelation(RelationDTO.builder().personId(105L).relativeId(104L).relationType(RelationType.CHILD).build());
+		relationController.addRelation(RelationDTO.builder().personId(105L).relativeId(106L).relationType(RelationType.SPOUSE).build());
+		
+		assertTrue(familyTreeController.getFamilyTree(104L).get(RelationType.PARENT).stream().anyMatch(gp -> gp.getId().equals(106L)));
+		assertTrue(familyTreeController.getFamilyTree(104L).get(RelationType.PARENT).stream().anyMatch(gp -> gp.getId().equals(105L)));
+		assertTrue(familyTreeController.getFamilyTree(106L).get(RelationType.CHILD).stream().anyMatch(gp -> gp.getId().equals(104L)));
 	}
 	
 	

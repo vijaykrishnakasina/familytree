@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oracle.familytree.dto.Person;
 import com.oracle.familytree.dto.RelationType;
-import com.oracle.familytree.service.FamilyTreeServiceImpl;
+import com.oracle.familytree.service.RelationService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,13 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 public class FamilyTreeController {
 
 	@Autowired
-	FamilyTreeServiceImpl familyTreeService;
+	RelationService relationService;
 
 	
 	@RequestMapping(value = "/familyTree/{id}", method = RequestMethod.GET)
 	public Map<RelationType, List<Person>> getFamilyTree(@PathVariable(value = "id") Long id) {
 		log.info(String.valueOf(id));
-		return familyTreeService.getRelatives(id);
+		return relationService.getRelatives(id);
 	}
 
 }
