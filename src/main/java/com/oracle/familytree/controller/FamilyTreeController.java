@@ -28,5 +28,11 @@ public class FamilyTreeController {
 		log.info(String.valueOf(id));
 		return relationService.getRelatives(id);
 	}
+	
+	@RequestMapping(value = "/familyTree/v2/{id}", method = RequestMethod.GET)
+	public String getFamilyTreeV2(@PathVariable(value = "id") Long id) {
+		log.info(String.valueOf(id));
+		return relationService.getRelativesV2(id);
+	}
 
 }

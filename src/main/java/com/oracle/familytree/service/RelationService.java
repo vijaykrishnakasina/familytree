@@ -8,13 +8,16 @@ import static com.oracle.familytree.dto.RelationType.SIBLING;
 import static com.oracle.familytree.dto.RelationType.SPOUSE;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.oracle.familytree.dto.Person;
 import com.oracle.familytree.dto.Relation;
@@ -34,6 +37,8 @@ public class RelationService {
 	@Autowired
 	RelationRepository relationRepository;
 
+	@Autowired
+	RelationVisualizerService relationVisualizerService;
 	
 	/**
 	 * returns all relatives of the given person by person id group by relation type
@@ -110,8 +115,17 @@ public class RelationService {
 
 		}
 
-		relationRepository.saveAll(relations);
+		//relationRepository.saveAll(relations);
+		saveRelationsIfNotExist(relations);
 
+	}
+
+	private void saveRelationsIfNotExist(List<Relation> relations) {
+		for (Relation relation: relations) {
+			if (CollectionUtils.isEmpty(relationRepository.findAllByPersonAndRelateeAndRelationType(relation.getPerson(), relation.getRelatee(), relation.getRelationType()))){
+				relationRepository.save(relation);
+			}
+		}
 	}
 
 	/**
@@ -201,6 +215,27 @@ public class RelationService {
 
 		}
 
+		return null;
+	}
+
+	
+	/**
+	 * take a user and put him in a stack. recursively call getParents and add to the stack
+	 * @param id
+	 * @return
+	 */
+	public String getRelativesV2(Long id) {
+		
+		
+		
+		
+		
+		return relationVisualizerService.visualize(id);
+		
+	}
+
+	public String getRelativesV22(Long id) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
